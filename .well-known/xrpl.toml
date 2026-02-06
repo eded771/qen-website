@@ -1,0 +1,11 @@
+[[CURRENCIES]]
+issuer="rMKtYrPQ7eGM8zUbLyJgvWwiqxKPp1LbBw"
+currency="QEN"
+name="QEN - Quantum Entanglement Network"
+description="Quantum Entanglement Network - Connecting parallel economic realities through quantum-secured transactions. Revolutionary digital asset leveraging quantum mechanics principles for the future of decentralized finance."
+icon="https://qen.us/qen-logo.png"
+
+[[ACCOUNTS]]
+address="rMKtYrPQ7eGM8zUbLyJgvWwiqxKPp1LbBw"
+network="main"
+desc="Official QEN Token Issuer"
