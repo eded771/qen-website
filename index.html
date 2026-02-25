@@ -1,49 +1,60 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"><title>QEN.US - Digital Soul Expansion</title>
+    <meta charset="UTF-8">
+    <title>QEN.US - Digital Soul Expansion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/xrpl@2.2.3/dist/xrpl-latest-min.js"></script>
-    <style>.soul-gradient{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)}.hidden{display:none}</style>
+    <style>
+        .soul-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body class="soul-gradient text-white min-h-screen p-8 text-center font-sans">
     <nav class="text-3xl font-black text-sky-400 mb-12">QEN.US</nav>
 
-    <div id="login-section">
+    <div id="login-section" class="max-w-md mx-auto">
         <h1 class="text-4xl font-bold mb-6">80억 인류에게 100 QEN 지급</h1>
-        <button onclick="login()" class="bg-sky-500 px-12 py-5 rounded-full text-2xl font-bold mb-8 shadow-lg">Google 로그인</button>
-        <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 max-w-md mx-auto text-sm">
-            <p class="text-sky-400 font-bold mb-4">Xaman 지갑 연동 필수</p>
-            <div class="flex justify-center gap-10 underline">
+        <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold mb-12 shadow-lg w-full transition-all active:scale-95">Google 멤버 로그인</button>
+        
+        <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 text-sm">
+            <p class="text-sky-400 font-bold mb-4 italic">Xaman 지갑(XRPL) 연동 필수</p>
+            <div class="flex justify-center gap-10 underline font-bold">
                 <a href="https://apps.apple.com/us/app/xaman-wallet/id1440530471" target="_blank">iPhone</a>
                 <a href="https://play.google.com/store/apps/details?id=com.xrpl.xumm" target="_blank">Android</a>
             </div>
         </div>
     </div>
 
-    <div id="dashboard-section" class="hidden">
-        <div class="bg-slate-800/80 p-10 rounded-3xl border-2 border-sky-500 inline-block shadow-2xl max-w-lg w-full">
+    <div id="dashboard-section" class="hidden max-w-lg mx-auto">
+        <div class="bg-slate-800/80 p-10 rounded-3xl border-2 border-sky-500 shadow-2xl w-full">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <span class="text-sky-300 font-bold">MEMBER</span>
+                <span id="user-display" class="text-xs text-white bg-sky-600 px-2 py-1 rounded"></span>
+            </div>
+            
             <div class="mb-8">
-                <div class="text-sm text-sky-300 font-bold mb-2 uppercase">My Asset</div>
-                <div id="balance" class="text-7xl font-black text-white mb-2">100 QEN</div>
-                <p id="wallet-status" class="text-emerald-400 font-bold italic">✓ 자아지문 각인 성공</p>
+                <div class="text-6xl font-black text-white mb-2">100 QEN</div>
+                <p class="text-emerald-400 font-bold italic">✓ 자아지문 각인 성공</p>
             </div>
 
-            <div class="space-y-4 mb-8">
-                <input id="dest-address" type="text" placeholder="상대방 지갑 주소" class="w-full p-4 rounded-xl bg-black/40 border border-slate-600 text-sm">
+            <div class="space-y-4 mb-8 text-left">
+                <label class="text-xs text-slate-400">지갑 주소</label>
+                <input id="dest-address" type="text" placeholder="상상대방 주소 입력" class="w-full p-4 rounded-xl bg-black/40 border border-slate-600 text-sm">
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="handleTransaction('receive')" class="bg-emerald-600 py-4 rounded-xl font-bold">코인 받기</button>
-                    <button onclick="handleTransaction('send')" class="bg-sky-600 py-4 rounded-xl font-bold">코인 보내기</button>
+                    <button onclick="handleTransaction('receive')" class="bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold">코인 받기</button>
+                    <button onclick="handleTransaction('send')" class="bg-sky-600 hover:bg-sky-500 py-4 rounded-xl font-bold">코인 보내기</button>
                 </div>
             </div>
             
-            <code id="soul-id" class="text-[10px] text-slate-500 break-all bg-black/30 p-4 rounded-xl block"></code>
+            <button onclick="logout()" class="text-xs text-slate-500 underline mb-4">로그아웃</button>
+            <code id="soul-id" class="text-[10px] text-slate-600 break-all bg-black/30 p-4 rounded-xl block"></code>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyB28Tpr-" + "YlLs8wCCXhdBKPDzhlRILE1Lf4",
@@ -57,22 +68,26 @@
         const provider = new GoogleAuthProvider();
 
         onAuthStateChanged(auth, (user) => {
+            const loginSection = document.getElementById('login-section');
+            const dashboardSection = document.getElementById('dashboard-section');
             if (user) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('dashboard-section').classList.remove('hidden');
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                document.getElementById('user-display').innerText = user.displayName;
                 document.getElementById('soul-id').innerText = "UID: " + user.uid;
+            } else {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
             }
         });
 
         window.login = () => signInWithPopup(auth, provider);
-
-        // XRPL 전송 및 지갑 연동 로직
-        window.handleTransaction = async (type) => {
+        window.logout = () => signOut(auth);
+        
+        window.handleTransaction = (type) => {
             const dest = document.getElementById('dest-address').value;
             if (type === 'send' && !dest) return alert("보낼 주소를 입력하세요.");
-            
-            // Xaman 지갑 호출
-            alert(type === 'send' ? `${dest}로 전송을 시도합니다.` : "지갑을 연결하여 100 QEN을 수령합니다.");
+            alert(type === 'send' ? `${dest}로 100 QEN 전송을 시도합니다.` : "Xaman 지갑에서 수령을 승인하십시오.");
             window.location.href = "xumm://"; 
         };
     </script>
