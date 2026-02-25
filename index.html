@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"><title>QEN.US - Digital Soul Expansion</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/xrpl@2.2.3/dist/xrpl-latest-min.js"></script>
     <style>.soul-gradient{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)}.hidden{display:none}</style>
 </head>
 <body class="soul-gradient text-white min-h-screen p-8 text-center font-sans">
@@ -10,12 +11,10 @@
 
     <div id="login-section">
         <h1 class="text-4xl font-bold mb-6">80억 인류에게 100 QEN 지급</h1>
-        <p class="text-slate-400 mb-8 italic">자아지문을 블록체인에 영원히 각인하고 자산을 확보하세요.</p>
-        <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold mb-12 shadow-lg transition-transform active:scale-95">Google 계정으로 시작</button>
-        
+        <button onclick="login()" class="bg-sky-500 px-12 py-5 rounded-full text-2xl font-bold mb-8 shadow-lg">Google 로그인</button>
         <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 max-w-md mx-auto text-sm">
-            <p class="text-sky-400 font-bold mb-4 italic">Xaman 지갑(XRP Ledger) 연동 필수</p>
-            <div class="flex justify-center gap-10 font-bold underline">
+            <p class="text-sky-400 font-bold mb-4">Xaman 지갑 연동 필수</p>
+            <div class="flex justify-center gap-10 underline">
                 <a href="https://apps.apple.com/us/app/xaman-wallet/id1440530471" target="_blank">iPhone</a>
                 <a href="https://play.google.com/store/apps/details?id=com.xrpl.xumm" target="_blank">Android</a>
             </div>
@@ -24,13 +23,18 @@
 
     <div id="dashboard-section" class="hidden">
         <div class="bg-slate-800/80 p-10 rounded-3xl border-2 border-sky-500 inline-block shadow-2xl max-w-lg w-full">
-            <div class="text-sm text-sky-300 font-bold mb-2 tracking-widest uppercase">My Asset</div>
-            <div class="text-7xl font-black text-white mb-4">100 QEN</div>
-            <p class="text-emerald-400 font-bold mb-8 italic">✓ 디지털 자아지문 각인 성공</p>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <button onclick="openWallet('receive')" class="bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold">코인 받기</button>
-                <button onclick="openWallet('send')" class="bg-sky-600 hover:bg-sky-500 py-4 rounded-xl font-bold">코인 보내기</button>
+            <div class="mb-8">
+                <div class="text-sm text-sky-300 font-bold mb-2 uppercase">My Asset</div>
+                <div id="balance" class="text-7xl font-black text-white mb-2">100 QEN</div>
+                <p id="wallet-status" class="text-emerald-400 font-bold italic">✓ 자아지문 각인 성공</p>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <input id="dest-address" type="text" placeholder="상대방 지갑 주소" class="w-full p-4 rounded-xl bg-black/40 border border-slate-600 text-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="handleTransaction('receive')" class="bg-emerald-600 py-4 rounded-xl font-bold">코인 받기</button>
+                    <button onclick="handleTransaction('send')" class="bg-sky-600 py-4 rounded-xl font-bold">코인 보내기</button>
+                </div>
             </div>
             
             <code id="soul-id" class="text-[10px] text-slate-500 break-all bg-black/30 p-4 rounded-xl block"></code>
@@ -61,8 +65,14 @@
         });
 
         window.login = () => signInWithPopup(auth, provider);
-        window.openWallet = (type) => {
-            alert(type === 'send' ? "상대방 주소를 입력하세요." : "지갑을 대조하여 코인을 수령합니다.");
+
+        // XRPL 전송 및 지갑 연동 로직
+        window.handleTransaction = async (type) => {
+            const dest = document.getElementById('dest-address').value;
+            if (type === 'send' && !dest) return alert("보낼 주소를 입력하세요.");
+            
+            // Xaman 지갑 호출
+            alert(type === 'send' ? `${dest}로 전송을 시도합니다.` : "지갑을 연결하여 100 QEN을 수령합니다.");
             window.location.href = "xumm://"; 
         };
     </script>
