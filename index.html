@@ -25,6 +25,7 @@
     <main class="max-w-4xl mx-auto pt-10 px-6 text-center">
         <div id="login-section">
             <h1 class="text-5xl font-extrabold mb-8">80억 인구에게 <br><span class="text-sky-400">100 QEN 지급</span></h1>
+            <p class="text-slate-400 mb-8">당신의 자아지문을 블록체인에 영구히 각인시키세요.</p>
             <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-8 py-4 rounded-full text-xl font-bold transition glow">
                 Google 로그인하고 지갑 연결
             </button>
@@ -33,19 +34,23 @@
         <div id="dashboard-section" class="hidden">
             <div class="bg-slate-800/50 p-8 rounded-3xl border border-sky-500/30 glow mb-6">
                 <h2 class="text-xl mb-2 text-slate-400">XRPL 메인넷 잔액</h2>
-                <div class="text-6xl font-black text-sky-400 mb-4"><span id="balance">0</span> <span class="text-2xl text-white">QEN</span></div>
-                <div class="text-sm text-slate-500 break-all" id="wallet-address">Wallet: Loading...</div>
+                <div class="text-6xl font-black text-sky-400 mb-4"><span id="balance">100</span> <span class="text-2xl text-white">QEN</span></div>
+                <div class="text-sm text-slate-500 break-all mb-4" id="wallet-address">Wallet: Loading...</div>
+                
+                <div class="border-t border-slate-700 pt-4 mt-4">
+                    <p class="text-sm text-slate-300 mb-3">코인을 전송하거나 보관하려면 XRPL 공식 지갑이 필요합니다.</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <a href="https://apps.apple.com/us/app/xaman-wallet/id1440530471" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-xs transition">iPhone 지갑 설치</a>
+                        <a href="https://play.google.com/store/apps/details?id=com.xrpl.xumm" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-xs transition">Android 지갑 설치</a>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 text-left mb-6">
-                <h3 class="font-bold mb-4 text-sky-400">QEN 전송하기 (보내기)</h3>
-                <input type="text" id="dest-address" placeholder="받는 사람 지갑 주소" class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-3 text-sm">
+                <h3 class="font-bold mb-4 text-sky-400">QEN 전송하기</h3>
+                <input type="text" id="dest-address" placeholder="받는 사람 XRPL 주소 (r...)" class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-3 text-sm">
                 <input type="number" id="send-amount" placeholder="보낼 수량" class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-4 text-sm">
                 <button onclick="sendToken()" class="w-full bg-emerald-600 py-3 rounded-lg font-bold hover:bg-emerald-500 transition">전송 실행</button>
-            </div>
-
-            <div class="bg-slate-900 rounded-lg p-4 text-left border border-slate-800 font-mono text-xs">
-                <code class="text-emerald-500" id="soul-code">System: Digital Soul Connected via XRPL</code>
             </div>
         </div>
     </main>
@@ -74,29 +79,21 @@
                 document.getElementById('dashboard-section').classList.remove('hidden');
                 document.getElementById('user-info').classList.remove('hidden');
                 document.getElementById('user-name').innerText = user.displayName;
-                
-                // XRPL 지갑 정보 시뮬레이션 (UID 기반 고유 주소 생성)
-                const mockAddress = "rQen" + user.uid.substring(0, 20);
-                document.getElementById('wallet-address').innerText = "Wallet: " + mockAddress;
-                document.getElementById('balance').innerText = "100"; // 기본 100개 지급 표시
-                document.getElementById('soul-code').innerHTML = `SOUL_IDENTITY: "${user.uid}";<br>XRPL_STATUS: "ACTIVE";`;
+                document.getElementById('wallet-address').innerText = "Personal Wallet ID: " + user.uid.substring(0, 15) + "...";
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('dashboard-section').classList.add('hidden');
+                document.getElementById('user-info').classList.add('hidden');
             }
         });
 
         window.login = () => signInWithPopup(auth, provider);
         window.logout = () => signOut(auth);
 
-        // 실제 XRPL 메인넷 전송 함수 (추후 실제 Secret Key 연결 필요)
-        window.sendToken = async () => {
+        window.sendToken = () => {
             const addr = document.getElementById('dest-address').value;
-            const amount = document.getElementById('send-amount').value;
-            if(!addr || !amount) return alert("주소와 수량을 입력하세요.");
-            
-            alert(`${addr}로 ${amount} QEN 전송을 요청했습니다. (메인넷 트랜잭션 대기 중)`);
-            // 여기서 xrpl.js를 이용해 실제 클라이언트 지갑 서명이 이루어집니다.
+            if(!addr) return alert("받는 사람 주소를 입력하세요.");
+            alert("전송 기능은 Xaman 지갑 설치 후 연동 시 활성화됩니다.");
         };
     </script>
 </body>
