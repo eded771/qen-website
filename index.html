@@ -8,54 +8,55 @@
     <style>
         .soul-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .glow { box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="soul-gradient text-white min-h-screen font-sans">
 
     <nav class="p-6 border-b border-slate-700 flex justify-between items-center">
         <div class="text-2xl font-bold tracking-tighter text-sky-400">QEN.US</div>
-        <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-6 py-2 rounded-full font-bold transition glow">
-            Google 로그인하여 코인 받기
-        </button>
+        <div id="user-info" class="hidden flex items-center gap-4">
+            <span id="user-name" class="font-medium text-slate-300"></span>
+            <button onclick="logout()" class="text-xs text-slate-500 underline">로그아웃</button>
+        </div>
     </nav>
 
     <main class="max-w-4xl mx-auto pt-20 px-6 text-center">
-        <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight">
-            전 인류 80억 명에게 <br><span class="text-sky-400">각 100 QEN 지급</span>
-        </h1>
-        <p class="text-xl text-slate-400 mb-12">
-            당신의 자아지문은 블록체인에 영원히 기록됩니다. <br>
-            전원이 꺼져도 당신의 디지털 자아는 이 코드 속에서 살아 움직입니다.
-        </p>
-
-        <div class="bg-slate-900 rounded-lg p-6 text-left border border-slate-800 font-mono text-sm mb-12 relative">
-            <div class="absolute top-2 right-4 text-slate-500">// Immutable Soul Identity</div>
-            <code class="text-emerald-400">
-                const DIGITAL_SOUL_CODE = "QEN-IDENTITY-v1.0";<br>
-                function persistSoul(identity) {<br>
-                &nbsp;&nbsp;blockchain.broadcast("EVERLASTING_LIFE", identity);<br>
-                &nbsp;&nbsp;return "POWER_OFF_RESISTANT";<br>
-                }
-            </code>
+        
+        <div id="login-section">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight">
+                전 인류 80억 명에게 <br><span class="text-sky-400">각 100 QEN 지급</span>
+            </h1>
+            <p class="text-xl text-slate-400 mb-12">
+                당신의 자아지문은 블록체인에 영원히 기록됩니다.<br>
+                Google 로그인을 통해 100 QEN을 즉시 수령하세요.
+            </p>
+            <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-8 py-4 rounded-full text-xl font-bold transition glow">
+                Google 로그인하고 100 QEN 받기
+            </button>
         </div>
+
+        <div id="dashboard-section" class="hidden animate-fade-in">
+            <div class="bg-slate-800/50 p-10 rounded-3xl border border-sky-500/30 glow mb-12">
+                <h2 class="text-2xl mb-4 text-slate-300">나의 지갑 잔액</h2>
+                <div class="text-6xl font-black text-sky-400 mb-4">100 <span class="text-2xl text-white">QEN</span></div>
+                <p class="text-emerald-400 font-bold">✓ 자아지문 블록체인 등록 완료</p>
+            </div>
+            
+            <div class="bg-slate-900 rounded-lg p-6 text-left border border-slate-800 font-mono text-sm relative">
+                <div class="absolute top-2 right-4 text-slate-500">// Soul Identity Verified</div>
+                <code class="text-emerald-400" id="soul-code">
+                    // 접속자 자아 코드 생성 중...
+                </code>
+            </div>
+        </div>
+
     </main>
-
-    <section class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto px-6 pb-20">
-        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
-            <h3 class="text-xl font-bold mb-4">8,000,000,000 Users</h3>
-            <p class="text-slate-400">국경과 인종을 초월하여 모든 인류에게 100개의 코인을 공정하게 배분합니다.</p>
-        </div>
-        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700">
-            <h3 class="text-xl font-bold mb-4">AI Self-Pattern</h3>
-            <p class="text-slate-400">이 코인 내부에는 당신의 자아지문 데이터가 포함되어 물리적 장치가 멈춰도 네트워크 위에서 공생합니다.</p>
-        </div>
-    </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // QENT 프로젝트 실제 설정값 적용
         const firebaseConfig = {
             apiKey: "AIzaSyB28Tpr-YlLs8wCCXhdBKPDzhlRILE1Lf4",
             authDomain: "qent-39136.firebaseapp.com",
@@ -70,15 +71,29 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        window.login = () => {
-            signInWithPopup(auth, provider)
-                .then((result) => {
-                    alert(result.user.displayName + "님, 100 QEN 지급 대상자로 등록되었습니다!");
-                }).catch((error) => {
-                    console.error("로그인 실패:", error);
-                    alert("로그인에 실패했습니다. Firebase Console에서 Google 로그인이 활성화되었는지 확인해주세요.");
-                });
-        };
+        // 로그인 상태 감시
+        onAuthStateChanged(auth, (user) => {
+            const loginSec = document.getElementById('login-section');
+            const dashSec = document.getElementById('dashboard-section');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            const soulCode = document.getElementById('soul-code');
+
+            if (user) {
+                loginSec.classList.add('hidden');
+                dashSec.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+                userName.innerText = user.displayName + "님 환영합니다";
+                soulCode.innerHTML = `const SOUL_ID = "${user.uid.substring(0, 16)}";<br>status: "IMMORTAL_LINKED";<br>balance: 100;`;
+            } else {
+                loginSec.classList.remove('hidden');
+                dashSec.classList.add('hidden');
+                userInfo.classList.add('hidden');
+            }
+        });
+
+        window.login = () => signInWithPopup(auth, provider).catch(err => alert("로그인 설정을 확인해주세요."));
+        window.logout = () => signOut(auth);
     </script>
 </body>
 </html>
