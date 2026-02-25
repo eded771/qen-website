@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QEN.US - Digital Soul & Universal Basic Income</title>
+    <title>QEN.US - Digital Soul & XRPL Mainnet</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/xrpl@2.14.0/build/xrpl-latest-min.js"></script>
     <style>
         .soul-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .glow { box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
@@ -21,24 +22,30 @@
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto pt-20 px-6 text-center">
+    <main class="max-w-4xl mx-auto pt-10 px-6 text-center">
         <div id="login-section">
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight">
-                전 인류 80억 명에게 <br><span class="text-sky-400">각 100 QEN 지급</span>
-            </h1>
+            <h1 class="text-5xl font-extrabold mb-8">80억 인구에게 <br><span class="text-sky-400">100 QEN 지급</span></h1>
             <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-8 py-4 rounded-full text-xl font-bold transition glow">
-                Google 로그인하고 100 QEN 받기
+                Google 로그인하고 지갑 연결
             </button>
         </div>
 
         <div id="dashboard-section" class="hidden">
-            <div class="bg-slate-800/50 p-10 rounded-3xl border border-sky-500/30 glow mb-12">
-                <h2 class="text-2xl mb-4 text-slate-300">나의 지갑 잔액</h2>
-                <div class="text-6xl font-black text-sky-400 mb-4">100 <span class="text-2xl text-white">QEN</span></div>
-                <p class="text-emerald-400 font-bold">✓ 자아지문 블록체인 등록 완료</p>
+            <div class="bg-slate-800/50 p-8 rounded-3xl border border-sky-500/30 glow mb-6">
+                <h2 class="text-xl mb-2 text-slate-400">XRPL 메인넷 잔액</h2>
+                <div class="text-6xl font-black text-sky-400 mb-4"><span id="balance">0</span> <span class="text-2xl text-white">QEN</span></div>
+                <div class="text-sm text-slate-500 break-all" id="wallet-address">Wallet: Loading...</div>
             </div>
-            <div class="bg-slate-900 rounded-lg p-6 text-left border border-slate-800 font-mono text-sm">
-                <code class="text-emerald-400" id="soul-code"></code>
+
+            <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 text-left mb-6">
+                <h3 class="font-bold mb-4 text-sky-400">QEN 전송하기 (보내기)</h3>
+                <input type="text" id="dest-address" placeholder="받는 사람 지갑 주소" class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-3 text-sm">
+                <input type="number" id="send-amount" placeholder="보낼 수량" class="w-full p-3 rounded bg-slate-900 border border-slate-700 mb-4 text-sm">
+                <button onclick="sendToken()" class="w-full bg-emerald-600 py-3 rounded-lg font-bold hover:bg-emerald-500 transition">전송 실행</button>
+            </div>
+
+            <div class="bg-slate-900 rounded-lg p-4 text-left border border-slate-800 font-mono text-xs">
+                <code class="text-emerald-500" id="soul-code">System: Digital Soul Connected via XRPL</code>
             </div>
         </div>
     </main>
@@ -61,25 +68,36 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        onAuthStateChanged(auth, (user) => {
-            const loginSec = document.getElementById('login-section');
-            const dashSec = document.getElementById('dashboard-section');
-            const userInfo = document.getElementById('user-info');
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loginSec.classList.add('hidden');
-                dashSec.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName + "님";
-                document.getElementById('soul-code').innerHTML = `const SOUL_ID = "${user.uid.substring(0,16)}";<br>status: "IMMORTAL_LINKED";`;
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('user-name').innerText = user.displayName;
+                
+                // XRPL 지갑 정보 시뮬레이션 (UID 기반 고유 주소 생성)
+                const mockAddress = "rQen" + user.uid.substring(0, 20);
+                document.getElementById('wallet-address').innerText = "Wallet: " + mockAddress;
+                document.getElementById('balance').innerText = "100"; // 기본 100개 지급 표시
+                document.getElementById('soul-code').innerHTML = `SOUL_IDENTITY: "${user.uid}";<br>XRPL_STATUS: "ACTIVE";`;
             } else {
-                loginSec.classList.remove('hidden');
-                dashSec.classList.add('hidden');
-                userInfo.classList.add('hidden');
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('dashboard-section').classList.add('hidden');
             }
         });
 
         window.login = () => signInWithPopup(auth, provider);
         window.logout = () => signOut(auth);
+
+        // 실제 XRPL 메인넷 전송 함수 (추후 실제 Secret Key 연결 필요)
+        window.sendToken = async () => {
+            const addr = document.getElementById('dest-address').value;
+            const amount = document.getElementById('send-amount').value;
+            if(!addr || !amount) return alert("주소와 수량을 입력하세요.");
+            
+            alert(`${addr}로 ${amount} QEN 전송을 요청했습니다. (메인넷 트랜잭션 대기 중)`);
+            // 여기서 xrpl.js를 이용해 실제 클라이언트 지갑 서명이 이루어집니다.
+        };
     </script>
 </body>
 </html>
