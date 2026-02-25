@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -24,19 +25,36 @@
     <main class="max-w-4xl mx-auto pt-16 px-6 text-center">
         <div id="login-section">
             <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
-                80억 인류에게 <br><span class="text-sky-400">100 QEN을 드립니다</span>
+                80억 인류에게 <br><span class="text-sky-400">100 QEN 지급</span>
             </h1>
-            <p class="text-xl text-slate-400 mb-10">Google 계정을 선택하여 당신의 자아지문을 등록하세요.</p>
-            <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold transition glow text-white">
+            <p class="text-xl text-slate-400 mb-10">Google 계정으로 로그인하고 본인의 지갑으로 코인을 받으세요.</p>
+            
+            <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold transition glow mb-12">
                 Google 계정 선택하기
             </button>
+
+            <div class="mt-8 p-6 bg-slate-800/30 rounded-2xl border border-slate-700">
+                <p class="text-sm text-slate-400 mb-4">QEN 코인을 보관할 XRPL 공식 지갑을 먼저 준비하세요</p>
+                <div class="flex justify-center gap-6">
+                    <a href="https://apps.apple.com/us/app/xaman-wallet/id1440530471" target="_blank" class="hover:scale-105 transition"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/ko-kr?size=250x83" alt="iOS" class="h-10"></a>
+                    <a href="https://play.google.com/store/apps/details?id=com.xrpl.xumm" target="_blank" class="hover:scale-105 transition"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Android" class="h-14 -mt-2"></a>
+                </div>
+            </div>
         </div>
 
         <div id="dashboard-section" class="hidden">
             <div class="bg-slate-800/60 p-10 rounded-3xl border border-sky-500/40 glow mb-8">
-                <h2 class="text-2xl mb-2 text-slate-400">지급 완료</h2>
+                <h2 class="text-2xl mb-2 text-slate-400">내 지갑 잔액</h2>
                 <div class="text-8xl font-black text-sky-400 mb-4">100 <span class="text-3xl text-white font-light">QEN</span></div>
-                <p class="text-emerald-400 font-bold italic">✓ 블록체인 네트워크에 자아지문 고정됨</p>
+                <p class="text-emerald-400 font-bold italic mb-6">✓ 블록체인 예약 완료</p>
+                
+                <div class="border-t border-slate-700 pt-6">
+                    <p class="text-sm text-sky-300 mb-4 font-bold">전송을 위해 Xaman 지갑에 이 계정을 연결하세요</p>
+                    <div class="flex justify-center gap-4">
+                        <a href="https://apps.apple.com/us/app/xaman-wallet/id1440530471" target="_blank" class="text-xs bg-slate-700 px-4 py-2 rounded-lg border border-slate-600">iPhone 설치</a>
+                        <a href="https://play.google.com/store/apps/details?id=com.xrpl.xumm" target="_blank" class="text-xs bg-slate-700 px-4 py-2 rounded-lg border border-slate-600">Android 설치</a>
+                    </div>
+                </div>
             </div>
             <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-700 text-left">
                 <h3 class="text-sky-400 font-bold mb-2 text-sm text-center">내 고유 자아 코드</h3>
@@ -61,12 +79,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
-
-        // 1. 세션이 끝나면(브라우저 닫기 등) 자동으로 로그아웃되도록 설정
-        setPersistence(auth, browserSessionPersistence);
-
-        // 2. 로그인 시 무조건 구글 계정 선택창이 뜨도록 강제 설정
         provider.setCustomParameters({ prompt: 'select_account' });
+        setPersistence(auth, browserSessionPersistence);
 
         onAuthStateChanged(auth, (user) => {
             const loginSec = document.getElementById('login-section');
@@ -86,10 +100,7 @@
         });
 
         window.login = () => signInWithPopup(auth, provider);
-        // 3. 로그아웃 시 페이지를 새로고침하여 모든 정보를 초기화
-        window.logout = () => signOut(auth).then(() => {
-            window.location.reload();
-        });
+        window.logout = () => signOut(auth).then(() => window.location.reload());
     </script>
 </body>
 </html>
