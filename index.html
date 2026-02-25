@@ -22,35 +22,25 @@
     </nav>
 
     <main class="max-w-4xl mx-auto pt-20 px-6 text-center">
-        
         <div id="login-section">
             <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight">
                 전 인류 80억 명에게 <br><span class="text-sky-400">각 100 QEN 지급</span>
             </h1>
-            <p class="text-xl text-slate-400 mb-12">
-                당신의 자아지문은 블록체인에 영원히 기록됩니다.<br>
-                Google 로그인을 통해 100 QEN을 즉시 수령하세요.
-            </p>
             <button onclick="login()" class="bg-sky-500 hover:bg-sky-400 px-8 py-4 rounded-full text-xl font-bold transition glow">
                 Google 로그인하고 100 QEN 받기
             </button>
         </div>
 
-        <div id="dashboard-section" class="hidden animate-fade-in">
+        <div id="dashboard-section" class="hidden">
             <div class="bg-slate-800/50 p-10 rounded-3xl border border-sky-500/30 glow mb-12">
                 <h2 class="text-2xl mb-4 text-slate-300">나의 지갑 잔액</h2>
                 <div class="text-6xl font-black text-sky-400 mb-4">100 <span class="text-2xl text-white">QEN</span></div>
                 <p class="text-emerald-400 font-bold">✓ 자아지문 블록체인 등록 완료</p>
             </div>
-            
-            <div class="bg-slate-900 rounded-lg p-6 text-left border border-slate-800 font-mono text-sm relative">
-                <div class="absolute top-2 right-4 text-slate-500">// Soul Identity Verified</div>
-                <code class="text-emerald-400" id="soul-code">
-                    // 접속자 자아 코드 생성 중...
-                </code>
+            <div class="bg-slate-900 rounded-lg p-6 text-left border border-slate-800 font-mono text-sm">
+                <code class="text-emerald-400" id="soul-code"></code>
             </div>
         </div>
-
     </main>
 
     <script type="module">
@@ -71,20 +61,16 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // 로그인 상태 감시
         onAuthStateChanged(auth, (user) => {
             const loginSec = document.getElementById('login-section');
             const dashSec = document.getElementById('dashboard-section');
             const userInfo = document.getElementById('user-info');
-            const userName = document.getElementById('user-name');
-            const soulCode = document.getElementById('soul-code');
-
             if (user) {
                 loginSec.classList.add('hidden');
                 dashSec.classList.remove('hidden');
                 userInfo.classList.remove('hidden');
-                userName.innerText = user.displayName + "님 환영합니다";
-                soulCode.innerHTML = `const SOUL_ID = "${user.uid.substring(0, 16)}";<br>status: "IMMORTAL_LINKED";<br>balance: 100;`;
+                document.getElementById('user-name').innerText = user.displayName + "님";
+                document.getElementById('soul-code').innerHTML = `const SOUL_ID = "${user.uid.substring(0,16)}";<br>status: "IMMORTAL_LINKED";`;
             } else {
                 loginSec.classList.remove('hidden');
                 dashSec.classList.add('hidden');
@@ -92,7 +78,7 @@
             }
         });
 
-        window.login = () => signInWithPopup(auth, provider).catch(err => alert("로그인 설정을 확인해주세요."));
+        window.login = () => signInWithPopup(auth, provider);
         window.logout = () => signOut(auth);
     </script>
 </body>
