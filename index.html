@@ -22,19 +22,19 @@
     <nav class="text-3xl font-black text-sky-400 mb-12 italic tracking-tighter">QEN.US</nav>
 
     <div id="login-section" class="max-w-md mx-auto">
-        <h1 id="title-text" class="text-4xl font-extrabold mb-6 leading-tight">Distributing 100 QEN<br><span class="text-sky-400">to 8 Billion People</span></h1>
+        <h1 class="text-4xl font-extrabold mb-6 leading-tight">Distributing 100 QEN<br><span class="text-sky-400">to 8 Billion People</span></h1>
         
-        <button onclick="login()" id="login-btn" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold mb-8 shadow-2xl w-full transition-all active:scale-95">Google Login</button>
+        <button onclick="window.loginGoogle()" class="bg-sky-500 hover:bg-sky-400 px-12 py-5 rounded-full text-2xl font-bold mb-8 shadow-2xl w-full transition-all active:scale-95">Google Login</button>
 
         <div class="mt-6 p-6 bg-slate-800/50 rounded-2xl border border-slate-700">
             <h3 class="text-sm font-bold text-slate-400 mb-4 uppercase">Phone Number Login</h3>
             <div id="recaptcha-container"></div>
             <input type="tel" id="phone-number" placeholder="+1 949 610 3767" class="w-full p-4 rounded-xl bg-black/40 border border-slate-600 text-white mb-4 outline-none">
-            <button onclick="sendOTP()" id="send-otp-btn" class="bg-emerald-600 hover:bg-emerald-500 w-full py-4 rounded-xl font-bold transition">Send Verification SMS</button>
+            <button onclick="window.sendOTP()" id="send-otp-btn" class="bg-emerald-600 hover:bg-emerald-500 w-full py-4 rounded-xl font-bold transition">Send Verification SMS</button>
             
             <div id="otp-section" class="hidden mt-4">
                 <input type="text" id="verification-code" placeholder="Enter 123456" class="w-full p-4 rounded-xl bg-black/40 border border-slate-600 text-white mb-4 outline-none">
-                <button onclick="verifyOTP()" class="bg-white text-black w-full py-4 rounded-xl font-bold">Verify & Login</button>
+                <button onclick="window.verifyOTP()" class="bg-white text-black w-full py-4 rounded-xl font-bold">Verify & Login</button>
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
             <span id="user-display" class="text-white bg-sky-600 px-2 py-1 rounded"></span>
             <div class="text-7xl font-black text-white my-8">100 QEN</div>
             <p class="text-emerald-400 font-bold mb-8">✓ Soulprint Engraved on XRPL</p>
-            <button onclick="logout()" class="text-slate-500 underline text-sm">Logout</button>
+            <button onclick="window.logout()" class="text-slate-500 underline text-sm">Logout</button>
         </div>
     </div>
 
@@ -52,7 +52,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // [Eddy's Fix] Wendy님의 실제 프로젝트 설정값입니다.
         const firebaseConfig = {
             apiKey: "AIzaSyB28Tpr-YlLs8wCCXhdBKPDzhlRILE1Lf4",
             authDomain: "qent-39136.firebaseapp.com",
@@ -65,19 +64,24 @@
         const provider = new GoogleAuthProvider();
 
         onAuthStateChanged(auth, (user) => {
+            const loginSec = document.getElementById('login-section');
+            const dashSec = document.getElementById('dashboard-section');
             if (user) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('dashboard-section').classList.remove('hidden');
-                document.getElementById('user-display').innerText = user.phoneNumber || user.displayName;
+                loginSec.classList.add('hidden');
+                dashSec.classList.remove('hidden');
+                document.getElementById('user-display').innerText = user.phoneNumber || user.displayName || "Member";
             } else {
-                document.getElementById('login-section').classList.remove('hidden');
-                document.getElementById('dashboard-section').classList.add('hidden');
+                loginSec.classList.remove('hidden');
+                dashSec.classList.add('hidden');
             }
         });
 
         window.sendOTP = function() {
             const phoneNumber = document.getElementById('phone-number').value.replace(/\s/g, '');
+            if(!phoneNumber.startsWith('+')) return alert("Use international format (e.g., +1...)");
+            
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+            
             signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
                 .then((result) => {
                     window.confirmationResult = result;
@@ -88,10 +92,12 @@
 
         window.verifyOTP = function() {
             const code = document.getElementById('verification-code').value;
-            window.confirmationResult.confirm(code).catch((err) => alert("Invalid Code"));
+            window.confirmationResult.confirm(code)
+                .then(() => alert("Success!"))
+                .catch((err) => alert("Invalid Code: " + err.message));
         };
 
-        window.login = () => signInWithPopup(auth, provider);
+        window.loginGoogle = () => signInWithPopup(auth, provider);
         window.logout = () => signOut(auth);
     </script>
 </body>
