@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QEN.US - 메인</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, "Malgun Gothic", sans-serif;
+    font-size: 14px;
+    color: #222;
+    background: #fff;
+  }
+  a { color: #00c; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* 상단 바 */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border-bottom: 1px solid #ccc;
+    background: #f7f7f7;
+  }
+  .topbar .brand { font-size: 22px; font-weight: bold; color: #551a8b; }
+  .coin-btn {
+    display: inline-block;
+    padding: 6px 18px;
+    background: #551a8b;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  .coin-btn:hover { background: #3d1266; text-decoration: none; }
+
+  /* 3단 레이아웃 */
+  .wrap {
+    display: grid;
+    grid-template-columns: 180px 1fr 180px;
+    gap: 20px;
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 왼쪽 */
+  .left .post {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+  }
+  .left input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #aaa;
+    margin-bottom: 12px;
+  }
+  .left ul, .right ul { list-style: none; padding: 0; margin: 0; }
+  .left li, .right li { padding: 2px 0; }
+  .left h4, .right h4 { margin: 14px 0 4px; font-size: 13px; color: #555; }
+
+  /* 가운데 카테고리 */
+  .cats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .cat h3 {
+    margin: 0 0 6px;
+    padding: 3px 6px;
+    font-size: 14px;
+    background: #eee;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+  }
+  .cat h3 a { color: #222; }
+  .cat ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    columns: 2;
+    column-gap: 10px;
+  }
+  .cat li { padding: 2px 0; break-inside: avoid; }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    border-top: 1px solid #ccc;
+    color: #777;
+    font-size: 12px;
+  }
+
+  /* 모바일 */
+  @media (max-width: 800px) {
+    .wrap { grid-template-columns: 1fr; }
+    .cats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html">QEN.US</a>
+  <a class="coin-btn" href="index.backup.html">코인</a>
+</div>
+
+<div class="wrap">
+
+  <!-- 왼쪽 -->
+  <aside class="left">
+    <a class="post" href="#">게시글 올리기</a>
+    <input type="text" placeholder="검색">
+    <h4>내 계정</h4>
+    <ul>
+      <li><a href="#">로그인</a></li>
+      <li><a href="#">즐겨찾기</a></li>
+    </ul>
+    <h4>안내</h4>
+    <ul>
+      <li><a href="#">도움말</a></li>
+      <li><a href="#">안전 수칙</a></li>
+      <li><a href="#">이용약관</a></li>
+      <li><a href="#">개인정보처리방침</a></li>
+      <li><a href="#">문의하기</a></li>
+    </ul>
+  </aside>
+
+  <!-- 가운데 -->
+  <main class="cats">
+    <section class="cat">
+      <h3><a href="#">커뮤니티</a></h3>
+      <ul>
+        <li><a href="#">모임</a></li>
+        <li><a href="#">행사</a></li>
+        <li><a href="#">교회</a></li>
+        <li><a href="#">봉사</a></li>
+        <li><a href="#">분실물</a></li>
+        <li><a href="#">동네소식</a></li>
+        <li><a href="#">반려동물</a></li>
+        <li><a href="#">자유게시판</a></li>
+      </ul>
+    </section>
+
+    <section class="cat">
+      <h3><a href="#">주거</a></h3>
+      <ul>
+        <li><a href="#">렌트</a></li>
+        <li><a href="#">룸메이트</a></li>
+        <li><a href="#">매매</a></li>
+        <li><a href="#">상가</a></li>
+        <li><a href="#">단기임대</a></li>
+        <li><a href="#">주차/창고</a></li>
+      </ul>
+    </section>
+
+    <section class="cat">
+      <h3><a href="#">구인구직</a></h3>
+      <ul>
+        <li><a href="#">사무직</a></li>
+        <li><a href="#">요식업</a></li>
+        <li><a href="#">IT/개발</a></li>
+        <li><a href="#">판매/영업</a></li>
+        <li><a href="#">운전/배송</a></li>
+        <li><a href="#">건설</a></li>
+        <li><a href="#">파트타임</a></li>
+        <li><a href="#">기타</a></li>
+      </ul>
+    </section>
+
+    <section class="cat">
+      <h3><a href="#">사고팔기</a></h3>
+      <ul>
+        <li><a href="#">전자제품</a></li>
+        <li><a href="#">가구</a></li>
+        <li><a href="#">자동차</a></li>
+        <li><a href="#">의류</a></li>
+        <li><a href="#">유아용품</a></li>
+        <li><a href="#">스포츠</a></li>
+        <li><a href="#">무료나눔</a></li>
+        <li><a href="#">기타</a></li>
+      </ul>
+    </section>
+
+    <section class="cat">
+      <h3><a href="#">서비스</a></h3>
+      <ul>
+        <li><a href="#">이사</a></li>
+        <li><a href="#">청소</a></li>
+        <li><a href="#">수리</a></li>
+        <li><a href="#">레슨</a></li>
+        <li><a href="#">법률/세무</a></li>
+        <li><a href="#">미용</a></li>
+      </ul>
+    </section>
+
+    <section class="cat">
+      <h3><a href="index.backup.html">QEN 코인</a></h3>
+      <ul>
+        <li><a href="index.backup.html">코인 안내</a></li>
+        <li><a href="#">공지사항</a></li>
+        <li><a href="#">자주 묻는 질문</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- 오른쪽 -->
+  <aside class="right">
+    <h4>지역</h4>
+    <ul>
+      <li><a href="#">오렌지카운티</a></li>
+      <li><a href="#">LA</a></li>
+      <li><a href="#">샌디에이고</a></li>
+      <li><a href="#">인랜드엠파이어</a></li>
+      <li><a href="#">샌프란시스코</a></li>
+      <li><a href="#">뉴욕</a></li>
+      <li><a href="#">애틀랜타</a></li>
+      <li><a href="#">시애틀</a></li>
+    </ul>
+    <h4>해외</h4>
+    <ul>
+      <li><a href="#">서울</a></li>
+      <li><a href="#">부산</a></li>
+      <li><a href="#">토론토</a></li>
+    </ul>
+  </aside>
+
+</div>
+
+<footer>
+  © 2026 QEN.US
+</footer>
+
+</body>
+</html>
