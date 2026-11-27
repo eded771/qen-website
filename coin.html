@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QEN - 우리 동네 만남 & 소모임</title>
+    <meta name="description" content="가장 가볍고 빠른 지역 기반 만남·취미·동네 친구 모임 플랫폼 QEN.US">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- 1. Header (Navbar) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-md group-hover:bg-blue-700 transition">
+                    Q
+                </div>
+                <div>
+                    <span class="font-extrabold text-xl tracking-tight text-slate-900">QEN<span class="text-blue-600">.US</span></span>
+                    <span class="hidden sm:inline-block text-xs font-semibold text-slate-400 ml-1.5 px-2 py-0.5 bg-slate-100 rounded-full">우리 동네 만남</span>
+                </div>
+            </a>
+
+            <!-- Region & Post Button -->
+            <div class="flex items-center gap-2.5">
+                <!-- Current Region Indicator -->
+                <button onclick="openRegionModal()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition border border-slate-200">
+                    <i class="fa-solid fa-location-dot text-blue-600"></i>
+                    <span id="currentRegionText">전체 지역</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                </button>
+
+                <!-- Create Meetup Button -->
+                <button onclick="openCreateModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>모임 열기</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Hero & Search Section -->
+    <section class="bg-white border-b border-slate-200 py-6 px-4">
+        <div class="max-w-4xl mx-auto text-center sm:text-left">
+            <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-2">
+                부담 없이 동네에서 만나는 진짜 인연
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mb-5">
+                카페 대화, 주말 러닝, 등산, 스터디까지 — 내 주변 사람들과 지금 시작하세요.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="relative max-w-xl">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="renderMeetups()" placeholder="동네 이름, 관심사(러닝, 커피, 보드게임) 검색..." class="w-full pl-11 pr-4 py-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition shadow-inner">
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Category Filter Tabs -->
+    <nav class="bg-slate-50 border-b border-slate-200 px-4 py-3 sticky top-16 z-20 backdrop-blur bg-opacity-95">
+        <div class="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <button onclick="setCategory('ALL')" class="cat-btn active px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-sm transition">
+                전체
+            </button>
+            <button onclick="setCategory('FRIEND')" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">
+                ☕ 커피 / 동네친구
+            </button>
+            <button onclick="setCategory('SPORTS')" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">
+                🏃 운동 / 산책 / 등산
+            </button>
+            <button onclick="setCategory('STUDY')" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">
+                📚 스터디 / 자기계발
+            </button>
+            <button onclick="setCategory('WEEKEND')" class="cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">
+                ⚡ 오늘 / 주말 번개
+            </button>
+        </div>
+    </nav>
+
+    <!-- 4. Meetup List Section -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-xs font-bold text-slate-500">
+                총 <span id="meetupCount" class="text-blue-600">0</span>개의 모임
+            </p>
+            <div class="text-xs text-slate-400">
+                최신순 정렬
+            </div>
+        </div>
+
+        <!-- Meetups Container -->
+        <div id="meetupsList" class="space-y-3">
+            <!-- Dynamic JavaScript insertion -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 px-4 bg-white rounded-2xl border border-dashed border-slate-300 my-4">
+            <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xl mb-3">
+                <i class="fa-regular fa-comment-dots"></i>
+            </div>
+            <p class="font-bold text-slate-700 mb-1">해당 조건의 모임이 아직 없습니다.</p>
+            <p class="text-xs text-slate-400 mb-4">우리 동네 첫 번째 모임을 직접 열어보세요!</p>
+            <button onclick="openCreateModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition">
+                지금 모임 만들기
+            </button>
+        </div>
+    </main>
+
+    <!-- 5. Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 px-4 text-center mt-auto">
+        <div class="max-w-4xl mx-auto text-xs text-slate-400 space-y-1.5">
+            <p class="font-semibold text-slate-600">QEN.US — 가볍고 안전한 지역 만남 커뮤니티</p>
+            <p>익명성과 상호 존중을 바탕으로 건강한 동네 문화를 만듭니다.</p>
+            <p class="text-[11px] text-slate-300">© 2026 QEN.US All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Modal 1: Region Selection -->
+    <div id="regionModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <h3 class="font-extrabold text-slate-900 text-base">지역 선택</h3>
+                <button onclick="closeRegionModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-xs font-semibold" id="regionButtonsContainer">
+                <!-- Regions generated via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Create Meetup -->
+    <div id="createModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div>
+                    <h3 class="font-black text-slate-900 text-lg">새 모임 열기</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">간단한 정보만 적고 동네 친구를 모아보세요.</p>
+                </div>
+                <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="createForm" onsubmit="handleCreateMeetup(event)" class="space-y-4 text-xs font-bold text-slate-700">
+                <div>
+                    <label class="block mb-1">카테고리</label>
+                    <select id="formCategory" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-semibold" required>
+                        <option value="FRIEND">☕ 커피 / 동네친구</option>
+                        <option value="SPORTS">🏃 운동 / 산책 / 등산</option>
+                        <option value="STUDY">📚 스터디 / 자기계발</option>
+                        <option value="WEEKEND">⚡ 오늘 / 주말 번개</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block mb-1">활동 지역 (시/도)</label>
+                        <select id="formRegion" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-semibold" required>
+                            <!-- Region options generated via JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1">상세 장소 (동/역 이름)</label>
+                        <input type="text" id="formLocationDetail" placeholder="예: 강남역 11번 출구" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-1">모임 제목</label>
+                    <input type="text" id="formTitle" placeholder="예: 토요일 오전 9시 양재천 5km 가볍게 러닝해요" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required maxlength="50">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block mb-1">모임 일시</label>
+                        <input type="text" id="formDate" placeholder="예: 이번 주 토요일 오전 9시" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required>
+                    </div>
+                    <div>
+                        <label class="block mb-1">모집 정원 (명)</label>
+                        <input type="number" id="formMaxParticipants" value="4" min="2" max="20" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-1">소개 및 주의사항</label>
+                    <textarea id="formDesc" rows="3" placeholder="어떤 분들이 오시면 좋은지, 대략적인 진행 방식을 적어주세요." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block mb-1">주최자 닉네임</label>
+                        <input type="text" id="formAuthor" placeholder="예: 에디" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required maxlength="12">
+                    </div>
+                    <div>
+                        <label class="block mb-1">연락처 / 오픈카톡 링크</label>
+                        <input type="text" id="formKakaoLink" placeholder="예: https://open.kakao.com/o/..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-600 font-medium" required>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-sm transition shadow-md">
+                        모임 등록 완료하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Meetup Detail -->
+    <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeDetailModal()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div id="detailContent">
+                <!-- Dynamically filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        const REGIONS = [
+            "전체", "서울", "경기", "인천", "부산", "대구", "대전", "광주", 
+            "울산", "세종", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주", "해외/기타"
+        ];
+
+        const CATEGORY_NAMES = {
+            "FRIEND": "☕ 커피/동네친구",
+            "SPORTS": "🏃 운동/산책/등산",
+            "STUDY": "📚 스터디/취미",
+            "WEEKEND": "⚡ 오늘/주말번개"
+        };
+
+        const CATEGORY_COLORS = {
+            "FRIEND": "bg-amber-50 text-amber-700 border-amber-200",
+            "SPORTS": "bg-emerald-50 text-emerald-700 border-emerald-200",
+            "STUDY": "bg-indigo-50 text-indigo-700 border-indigo-200",
+            "WEEKEND": "bg-rose-50 text-rose-700 border-rose-200"
+        };
+
+        // Initial Sample Data (Seed Data)
+        const DEFAULT_MEETUPS = [
+            {
+                id: "m-1",
+                region: "서울",
+                locationDetail: "강남역 9번 출구 인근",
+                category: "FRIEND",
+                title: "이번 주 목요일 저녁 조용한 카페에서 가벼운 커피 & 수다 떨 분",
+                date: "11월 26일(목) 저녁 7시 30분",
+                currentParticipants: 2,
+                maxParticipants: 4,
+                author: "루카스",
+                desc: "퇴근 후 가볍게 커피 마시면서 일상 이야기나 관심사 나누실 분 환영합니다! 부담 없이 1시간 정도 편하게 이야기 나눠요.",
+                kakaoLink: "https://open.kakao.com/",
+                createdAt: "2026-11-20"
+            },
+            {
+                id: "m-2",
+                region: "서울",
+                locationDetail: "양재 시민의숲역 1번 출구",
+                category: "SPORTS",
+                title: "토요일 아침 양재천 상쾌하게 5km 함께 러닝해요 (초보 환영)",
+                date: "11월 28일(토) 오전 8시 30분",
+                currentParticipants: 3,
+                maxParticipants: 6,
+                author: "에디",
+                desc: "1km당 6분 30초 페이스로 아주 여유롭게 달립니다. 뛰고 나서 근처 편의점에서 시원한 음료 한잔 마시고 쿨하게 해산합니다!",
+                kakaoLink: "https://open.kakao.com/",
+                createdAt: "2026-11-20"
+            },
+            {
+                id: "m-3",
+                region: "경기",
+                locationDetail: "성남 분당구 정자동 카페거리",
+                category: "STUDY",
+                title: "일요일 오후 각자 책 읽거나 노트북 작업하는 무언 스터디 모임",
+                date: "11월 29일(일) 오후 2시",
+                currentParticipants: 4,
+                maxParticipants: 6,
+                author: "소나무",
+                desc: "각자 할 일 집중해서 하고, 마지막 15분 동안 오늘 읽은 책이나 작업에 대해 가볍게 공유하는 자리입니다.",
+                kakaoLink: "https://open.kakao.com/",
+                createdAt: "2026-11-19"
+            },
+            {
+                id: "m-4",
+                region: "부산",
+                locationDetail: "해운대 달맞이길",
+                category: "WEEKEND",
+                title: "일요일 저녁 해운대 달맞이길 야경 산책 & 따뜻한 차 한잔",
+                date: "11월 29일(일) 저녁 8시",
+                currentParticipants: 2,
+                maxParticipants: 4,
+                author: "바다바람",
+                desc: "날씨 맑은 날 달맞이길 가볍게 40분 산책하고 따뜻한 차 한잔 마실 동네 이웃분 구합니다.",
+                kakaoLink: "https://open.kakao.com/",
+                createdAt: "2026-11-18"
+            }
+        ];
+
+        // App State
+        let currentRegion = "전체";
+        let currentCategory = "ALL";
+        let meetups = [];
+
+        // Initialize Data
+        function initData() {
+            const saved = localStorage.getItem("qen_meetups");
+            if (saved) {
+                try {
+                    meetups = JSON.parse(saved);
+                } catch(e) {
+                    meetups = DEFAULT_MEETUPS;
+                }
+            } else {
+                meetups = DEFAULT_MEETUPS;
+                saveData();
+            }
+            buildRegionButtons();
+            populateFormRegions();
+            renderMeetups();
+        }
+
+        function saveData() {
+            localStorage.setItem("qen_meetups", JSON.stringify(meetups));
+        }
+
+        // Region Buttons Builder
+        function buildRegionButtons() {
+            const container = document.getElementById("regionButtonsContainer");
+            container.innerHTML = REGIONS.map(reg => `
+                <button onclick="selectRegion('${reg}')" class="p-2.5 rounded-xl border ${currentRegion === reg ? 'bg-blue-600 text-white border-blue-600 font-bold' : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'} text-center transition">
+                    ${reg}
+                </button>
+            `).join('');
+        }
+
+        function populateFormRegions() {
+            const select = document.getElementById("formRegion");
+            select.innerHTML = REGIONS.filter(r => r !== "전체").map(r => `
+                <option value="${r}">${r}</option>
+            `).join('');
+        }
+
+        function openRegionModal() {
+            buildRegionButtons();
+            document.getElementById("regionModal").classList.remove("hidden");
+        }
+
+        function closeRegionModal() {
+            document.getElementById("regionModal").classList.add("hidden");
+        }
+
+        function selectRegion(reg) {
+            currentRegion = reg;
+            document.getElementById("currentRegionText").innerText = reg === "전체" ? "전체 지역" : reg;
+            closeRegionModal();
+            renderMeetups();
+        }
+
+        // Category Filter
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll(".cat-btn").forEach(btn => {
+                btn.className = "cat-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition";
+            });
+            event.target.className = "cat-btn active px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-sm transition";
+            renderMeetups();
+        }
+
+        // Render Meetup List
+        function renderMeetups() {
+            const listContainer = document.getElementById("meetupsList");
+            const emptyState = document.getElementById("emptyState");
+            const searchKeyword = document.getElementById("searchInput").value.trim().toLowerCase();
+
+            const filtered = meetups.filter(m => {
+                const matchRegion = (currentRegion === "전체" || m.region === currentRegion);
+                const matchCat = (currentCategory === "ALL" || m.category === currentCategory);
+                const matchSearch = (!searchKeyword || 
+                    m.title.toLowerCase().includes(searchKeyword) || 
+                    m.locationDetail.toLowerCase().includes(searchKeyword) ||
+                    m.desc.toLowerCase().includes(searchKeyword)
+                );
+                return matchRegion && matchCat && matchSearch;
+            });
+
+            document.getElementById("meetupCount").innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+            listContainer.innerHTML = filtered.map(m => {
+                const catColor = CATEGORY_COLORS[m.category] || "bg-slate-100 text-slate-700 border-slate-200";
+                const catName = CATEGORY_NAMES[m.category] || m.category;
+                const isFull = m.currentParticipants >= m.maxParticipants;
+
+                return `
+                <div onclick="openDetailModal('${m.id}')" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold border ${catColor}">
+                                ${catName}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                📍 ${m.region} · ${m.locationDetail}
+                            </span>
+                            <span class="text-xs text-slate-400 font-medium">
+                                🗓️ ${m.date}
+                            </span>
+                        </div>
+                        <h3 class="font-extrabold text-slate-900 text-base leading-snug hover:text-blue-600 transition">
+                            ${m.title}
+                        </h3>
+                        <p class="text-xs text-slate-500 line-clamp-1 font-medium">
+                            ${m.desc}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+                        <div class="text-right">
+                            <span class="inline-flex items-center gap-1 text-xs font-bold ${isFull ? 'text-rose-500' : 'text-blue-600'}">
+                                <i class="fa-solid fa-users"></i>
+                                <span>${m.currentParticipants} / ${m.maxParticipants}명</span>
+                            </span>
+                            <p class="text-[11px] text-slate-400">주최: ${m.author}</p>
+                        </div>
+                        <button class="px-3.5 py-2 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 text-xs font-bold rounded-xl transition">
+                            상세보기
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Open Detail Modal
+        function openDetailModal(id) {
+            const m = meetups.find(item => item.id === id);
+            if (!m) return;
+
+            const catColor = CATEGORY_COLORS[m.category] || "bg-slate-100 text-slate-700 border-slate-200";
+            const catName = CATEGORY_NAMES[m.category] || m.category;
+            const isFull = m.currentParticipants >= m.maxParticipants;
+
+            const content = document.getElementById("detailContent");
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${catColor}">
+                            ${catName}
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                            📍 ${m.region} (${m.locationDetail})
+                        </span>
+                    </div>
+
+                    <h2 class="text-lg sm:text-xl font-black text-slate-900 leading-snug">
+                        ${m.title}
+                    </h2>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1.5 text-xs text-slate-600">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-500">모임 일시</span>
+                            <span class="font-bold text-slate-900">${m.date}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-500">모임 장소</span>
+                            <span class="font-bold text-slate-900">${m.locationDetail}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-500">모집 인원</span>
+                            <span class="font-bold ${isFull ? 'text-rose-500' : 'text-blue-600'}">${m.currentParticipants}명 / 총 ${m.maxParticipants}명</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-500">주최자</span>
+                            <span class="font-semibold text-slate-800">${m.author}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-500 mb-1">상세 안내</h4>
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 whitespace-pre-line leading-relaxed font-medium">
+                            ${m.desc}
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex gap-2">
+                        <a href="${m.kakaoLink}" target="_blank" rel="noopener noreferrer" class="flex-1 py-3.5 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black text-xs sm:text-sm rounded-xl text-center transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-comment"></i>
+                            <span>오픈카톡으로 참여 문의하기</span>
+                        </a>
+                        <button onclick="joinMeetup('${m.id}')" class="px-4 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition">
+                            참여 +1
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("detailModal").classList.remove("hidden");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.add("hidden");
+        }
+
+        function joinMeetup(id) {
+            const m = meetups.find(item => item.id === id);
+            if (!m) return;
+            if (m.currentParticipants >= m.maxParticipants) {
+                alert("정원이 이미 가득 찼습니다!");
+                return;
+            }
+            m.currentParticipants += 1;
+            saveData();
+            openDetailModal(id);
+            renderMeetups();
+            alert("참여 신청이 반영되었습니다! 오픈카톡 링크를 통해 모임원들과 인사해보세요.");
+        }
+
+        // Modal Controls
+        function openCreateModal() {
+            document.getElementById("createModal").classList.remove("hidden");
+        }
+
+        function closeCreateModal() {
+            document.getElementById("createModal").classList.add("hidden");
+        }
+
+        // Handle Create Meetup Form Submission
+        function handleCreateMeetup(e) {
+            e.preventDefault();
+
+            const newMeetup = {
+                id: "m-" + Date.now(),
+                category: document.getElementById("formCategory").value,
+                region: document.getElementById("formRegion").value,
+                locationDetail: document.getElementById("formLocationDetail").value.trim(),
+                title: document.getElementById("formTitle").value.trim(),
+                date: document.getElementById("formDate").value.trim(),
+                maxParticipants: parseInt(document.getElementById("formMaxParticipants").value),
+                currentParticipants: 1,
+                author: document.getElementById("formAuthor").value.trim(),
+                desc: document.getElementById("formDesc").value.trim(),
+                kakaoLink: document.getElementById("formKakaoLink").value.trim(),
+                createdAt: new Date().toISOString().split("T")[0]
+            };
+
+            meetups.unshift(newMeetup);
+            saveData();
+            document.getElementById("createForm").reset();
+            closeCreateModal();
+            renderMeetups();
+            alert("🎉 새로운 모임이 성공적으로 개설되었습니다!");
+        }
+
+        // Run on load
+        window.onload = initData;
+    </script>
+</body>
+</html>
